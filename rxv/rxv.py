@@ -14,7 +14,7 @@ from math import floor
 import requests
 from defusedxml import cElementTree
 
-from .exceptions import (CommandUnavailable, MenuUnavailable,
+from exceptions import (CommandUnavailable, MenuUnavailable,
                          MenuActionUnavailable, PlaybackUnavailable,
                          ResponseException, UnknownPort)
 
@@ -129,7 +129,11 @@ class RXV(object):
         self._surround_programs_cache = None
         self._scenes_cache = None
         self._session = requests.Session()
-        self._discover_features()
+
+        if self.unit_desc_url != "None":
+            self._discover_features()
+        else:
+            self._discover_legacy_features()
 
     def _discover_features(self):
         """Pull and parse the desc.xml so we can query it later."""
@@ -151,6 +155,9 @@ class RXV(object):
         except Exception:
             logger.exception("Failed to fetch %s" % self.unit_desc_url)
             raise
+
+    def _discover_legacy_features(self):
+        print("Discovering features for legacy receiver")
 
     def __unicode__(self):
         return (f'<{self.__class__.__name__} '
